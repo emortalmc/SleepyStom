@@ -1,0 +1,5 @@
+{
+  "entrypoint": "dev.emortal.sleepystom.BedWarsExtension",
+  "name": "SleepyStom",
+  "version": "1.0.0"
+}
