@@ -1,7 +1,10 @@
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.extras.optifine.OptifineSupport;
+import net.minestom.server.instance.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +17,14 @@ public class TestServer {
         MojangAuth.init();
 
         MinecraftServer.getSchedulerManager().buildShutdownTask(TestServer::shutdown);
+
+        Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
+        MinecraftServer.getGlobalEventHandler().addListener(PlayerLoginEvent.class, event -> {
+            event.setSpawningInstance(instance);
+            Player player = event.getPlayer();
+            player.setAllowFlying(true);
+            player.setFlying(true);
+        });
 
         String ip = System.getenv("minestom.address");
         int port = Integer.parseInt(System.getenv("minestom.port"));

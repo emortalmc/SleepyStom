@@ -1,10 +1,9 @@
 package dev.emortal.sleepystom.config;
 
-import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.emortal.sleepystom.BedWarsExtension;
-import dev.emortal.sleepystom.model.config.map.ConfigMap;
+import dev.emortal.sleepystom.model.config.map.BedWarsMap;
 import dev.emortal.sleepystom.utils.JsonUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -16,15 +15,18 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class MapManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapManager.class);
+    private static final Set<String> RESERVED_NAMES = Set.of("all");
 
-    private final @NotNull Map<String, ConfigMap> maps = Maps.newHashMap();
+    private final @NotNull Map<String, BedWarsMap> maps = new ConcurrentHashMap<>();
 
     public MapManager(BedWarsExtension extension) {
-        Path basePath = extension.dataDirectory().resolve("maps");
+        Path basePath = extension.getDataDirectory().resolve("maps");
         try {
             for (Path path : Files.list(basePath).collect(Collectors.toSet())) {
                 Optional<JsonElement> optionalElement = JsonUtils.readPath(path);
@@ -34,8 +36,10 @@ public class MapManager {
                 }
                 JsonElement element = optionalElement.get();
                 JsonObject jsonObject = element.getAsJsonObject();
-                ConfigMap configMap = ConfigMap.fromJson(jsonObject);
-                this.maps.put(configMap.name(), configMap);
+                BedWarsMap map = BedWarsMap.fromJson(jsonObject);
+
+                this.createMap(map);
+                this.maps.put(map.getName(), map);
             }
         } catch (IOException ex) {
             if (ex instanceof NoSuchFileException) {
@@ -46,11 +50,18 @@ public class MapManager {
         }
     }
 
-    public @NotNull Map<String, ConfigMap> getMaps() {
+    public void createMap(@NotNull BedWarsMap map) {
+        if (RESERVED_NAMES.contains(map.getName()))
+            throw new IllegalArgumentException("Map name " + map.getName() + " is a reserved extension name and cannot be used");
+
+        this.maps.put(map.getName(), map);
+    }
+
+    public @NotNull Map<String, BedWarsMap> getMaps() {
         return this.maps;
     }
 
-    public @NotNull Optional<ConfigMap> getMap(@NotNull String name) {
+    public @NotNull Optional<BedWarsMap> getMap(@NotNull String name) {
         return Optional.ofNullable(this.maps.get(name));
     }
 }
