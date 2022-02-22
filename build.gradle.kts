@@ -16,8 +16,7 @@ dependencies {
     compileOnly("com.github.Minestom:Minestom:dab6ec6000") // Dead Code commit
     implementation("net.kyori:adventure-text-minimessage:4.2.0-SNAPSHOT")
     implementation("com.google.guava:guava:31.0.1-jre")
-
-
+    implementation("com.typesafe:config:1.4.1")
 
     testImplementation("com.github.Minestom:Minestom:dab6ec6000")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
