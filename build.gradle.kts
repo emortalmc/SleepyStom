@@ -20,7 +20,7 @@ dependencies {
 
 
     testImplementation("com.github.Minestom:Minestom:dab6ec6000")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
