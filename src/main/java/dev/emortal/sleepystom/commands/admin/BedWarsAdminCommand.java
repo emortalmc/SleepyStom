@@ -51,7 +51,7 @@ public class BedWarsAdminCommand extends Command {
         if (map == null)
             return;
 
-        this.mapManager.createMap(new BedWarsMap(mapName, new ArrayList<>()));
+        this.mapManager.createMap(new BedWarsMap(mapName));
         sender.sendMessage("Map created! Use /bwa edit map " + mapName + " to edit its properties.");
     }
 

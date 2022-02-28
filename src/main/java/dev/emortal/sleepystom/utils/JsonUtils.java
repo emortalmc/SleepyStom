@@ -1,7 +1,11 @@
 package dev.emortal.sleepystom.utils;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,5 +26,23 @@ public class JsonUtils {
         }
 
         return Optional.empty();
+    }
+
+    public static @NotNull Pos jsonToPos(@NotNull JsonObject json) {
+        double x = json.get("x").getAsDouble();
+        double y = json.get("y").getAsDouble();
+        double z = json.get("z").getAsDouble();
+        float yaw = json.get("yaw").getAsFloat();
+        float pitch = json.get("pitch").getAsFloat();
+
+        return new Pos(x, y, z, yaw, pitch);
+    }
+
+    public static @NotNull Vec jsonToVec(@NotNull JsonObject json) {
+        double x = json.get("x").getAsDouble();
+        double y = json.get("y").getAsDouble();
+        double z = json.get("z").getAsDouble();
+
+        return new Vec(x, y, z);
     }
 }

@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
@@ -132,13 +133,13 @@ public class EditorManager {
         Block blockBelow = player.getInstance().getBlock(locationBelow);
 
         Material suggestedMaterial = blockBelow == Block.AIR ? Material.AIR : GeneratorUtils.suggestMaterial(Material.fromNamespaceId(blockBelow.namespace()));
-        MapGenerator generator = new MapGenerator(locationBelow, suggestedMaterial);
+        MapGenerator generator = new MapGenerator(Vec.fromPoint(locationBelow), suggestedMaterial);
 
         EditGeneratorInventory editor = new EditGeneratorInventory(this.editUsers.get(player), generator);
         player.openInventory(editor);
     }
 
-    private void saveInstance(Player player) {
+    private void saveInstance(@NotNull Player player) {
         Instant startTime = Instant.now();
         player.sendMessage(Component.text("Saving world to storage..."));
         player.getInstance().saveChunksToStorage().thenAccept(unused ->

@@ -2,6 +2,8 @@ package dev.emortal.sleepystom.game.editor;
 
 import dev.emortal.sleepystom.model.config.map.MapGenerator;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.EventFilter;
 import net.minestom.server.event.EventNode;
@@ -24,15 +26,18 @@ public class EditGeneratorInventory extends Inventory {
             .addChild(EventNode.value("edit-generator", EventFilter.PLAYER, player -> true));
 
         Material currentMaterial = this.generator.getMaterial();
+        String currentMaterialName = currentMaterial == Material.AIR ? "None" : currentMaterial.namespace().value();
         this.setItemStack(0,
-            ItemStack.builder(Material.BEDROCK)
-                .displayName(Component.text("Generated Material"))
-                .lore(Component.text("Current Material: " + (currentMaterial == Material.AIR ? "None" : currentMaterial.name())))
+            ItemStack.builder(currentMaterial == Material.AIR ? Material.BEDROCK : currentMaterial)
+                .displayName(Component.text("Generated Material", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false))
+                .lore(
+                    Component.empty(),
+                    Component.text("Current Material: " + currentMaterialName, NamedTextColor.RED).decoration(TextDecoration.ITALIC, false))
                 .build()
         );
     }
 
-    public void show(Player player) {
+    public void show(@NotNull Player player) {
         player.openInventory(this);
     }
 

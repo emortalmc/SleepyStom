@@ -1,5 +1,5 @@
 {
-  "name": "fuscia",
+  "name": "treenan",
   "minTeamSize": 2,
   "maxTeamSize": 4,
   "teams": [
@@ -14,5 +14,6 @@
         "pitch": 10
       }
     }
-  ]
+  ],
+  "generators": []
 }
