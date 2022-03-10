@@ -1,23 +1,22 @@
 package dev.emortal.sleepystom.model.game.live;
 
-import dev.emortal.sleepystom.model.config.map.MapGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
 import net.minestom.server.entity.hologram.Hologram;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class LiveGenerator {
-    private final @NotNull MapGenerator mapGenerator;
+    private final @NotNull ConfigGenerator mapGenerator;
     private @NotNull Hologram hologram;
     private @NotNull Task task;
 
-    public LiveGenerator(@NotNull MapGenerator mapGenerator, @NotNull Hologram hologram, @NotNull Task task) {
+    public LiveGenerator(@NotNull ConfigGenerator mapGenerator, @NotNull Hologram hologram, @NotNull Task task) {
         this.mapGenerator = mapGenerator;
         this.hologram = hologram;
         this.task = task;
     }
 
-    public @NotNull MapGenerator getMapGenerator() {
+    public @NotNull ConfigGenerator getMapGenerator() {
         return this.mapGenerator;
     }
 

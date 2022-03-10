@@ -8,9 +8,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSerializer;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
-import dev.emortal.sleepystom.model.config.map.MapGenerator;
-import dev.emortal.sleepystom.model.config.map.MapTeam;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
+import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigTeam;
 import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.item.Material;
@@ -84,7 +84,7 @@ public class JsonUtils {
     private static final JsonDeserializer<Material> MATERIAL_DESERIALIZER = (element, type, context) ->
         Material.fromNamespaceId(element.getAsJsonObject().get("material").getAsString());
 
-    private static final JsonSerializer<BedWarsMap> BED_WARS_MAP_SERIALIZER = (map, type, context) -> {
+    private static final JsonSerializer<ConfigMap> BED_WARS_MAP_SERIALIZER = (map, type, context) -> {
         JsonObject json = new JsonObject();
         json.addProperty("name", map.getName());
         json.addProperty("filePath", map.getInstancePath().toString());
@@ -97,23 +97,23 @@ public class JsonUtils {
         return json;
     };
 
-    private static final JsonDeserializer<BedWarsMap> BED_WARS_MAP_DESERIALIZER = (element, type, context) -> {
+    private static final JsonDeserializer<ConfigMap> BED_WARS_MAP_DESERIALIZER = (element, type, context) -> {
         JsonObject json = element.getAsJsonObject();
         String name = json.get("name").getAsString();
         int minTeamSize = json.get("minTeamSize").getAsInt();
         int maxTeamSize = json.get("maxTeamSize").getAsInt();
-        Set<MapTeam> teams = context.deserialize(json.get("teams"), new TypeToken<HashSet<MapTeam>>(){}.getType());
-        Set<MapGenerator> generators = context.deserialize(json.get("generators"), new TypeToken<HashSet<MapGenerator>>(){}.getType());
+        Set<ConfigTeam> teams = context.deserialize(json.get("teams"), new TypeToken<HashSet<ConfigTeam>>(){}.getType());
+        Set<ConfigGenerator> generators = context.deserialize(json.get("generators"), new TypeToken<HashSet<ConfigGenerator>>(){}.getType());
 
         if (teams == null)
             teams = new HashSet<>();
         if (generators == null)
             generators = new HashSet<>();
 
-        return new BedWarsMap(name, teams, generators, minTeamSize, maxTeamSize);
+        return new ConfigMap(name, teams, generators, minTeamSize, maxTeamSize);
     };
 
-    private static final JsonSerializer<MapTeam> MAP_TEAM_SERIALIZER = (team, type, context) -> {
+    private static final JsonSerializer<ConfigTeam> MAP_TEAM_SERIALIZER = (team, type, context) -> {
         JsonObject json = new JsonObject();
         json.addProperty("name", team.name());
         json.add("color", context.serialize(team.color()));
@@ -122,13 +122,13 @@ public class JsonUtils {
         return json;
     };
 
-    private static final JsonDeserializer<MapTeam> MAP_TEAM_DESERIALIZER = (element, type, context) -> {
+    private static final JsonDeserializer<ConfigTeam> MAP_TEAM_DESERIALIZER = (element, type, context) -> {
         JsonObject json = element.getAsJsonObject();
         String name = json.get("name").getAsString();
         Color color = context.deserialize(json.get("color"), Color.class);
         Pos spawn = context.deserialize(json.get("spawn"), Pos.class);
 
-        return new MapTeam(name, color, spawn);
+        return new ConfigTeam(name, color, spawn);
     };
 
     public static Gson GSON = new GsonBuilder()
@@ -145,11 +145,11 @@ public class JsonUtils {
         .registerTypeAdapter(Material.class, MATERIAL_SERIALIZER)
         .registerTypeAdapter(Material.class, MATERIAL_DESERIALIZER)
         // bedwars classes
-        .registerTypeAdapter(BedWarsMap.class, BED_WARS_MAP_DESERIALIZER)
-        .registerTypeAdapter(BedWarsMap.class, BED_WARS_MAP_SERIALIZER)
+        .registerTypeAdapter(ConfigMap.class, BED_WARS_MAP_DESERIALIZER)
+        .registerTypeAdapter(ConfigMap.class, BED_WARS_MAP_SERIALIZER)
 
-        .registerTypeAdapter(MapTeam.class, MAP_TEAM_DESERIALIZER)
-        .registerTypeAdapter(MapTeam.class, MAP_TEAM_SERIALIZER)
+        .registerTypeAdapter(ConfigTeam.class, MAP_TEAM_DESERIALIZER)
+        .registerTypeAdapter(ConfigTeam.class, MAP_TEAM_SERIALIZER)
         .create();
 
     public static @NotNull Optional<JsonElement> readPath(Path path) {

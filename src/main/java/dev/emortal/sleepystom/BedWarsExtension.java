@@ -5,7 +5,7 @@ import dev.emortal.sleepystom.commands.admin.BedWarsDebugCommand;
 import dev.emortal.sleepystom.config.MapManager;
 import dev.emortal.sleepystom.game.editor.EditorManager;
 import dev.emortal.sleepystom.game.GameManager;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.builder.Command;
@@ -34,7 +34,7 @@ public class BedWarsExtension extends Extension {
         );
 
         try {
-            this.gameManager.createGame(this.mapManager.getMaps().values().toArray(new BedWarsMap[]{})[0]);
+            this.gameManager.createGame(this.mapManager.getMaps().values().toArray(new ConfigMap[]{})[0]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

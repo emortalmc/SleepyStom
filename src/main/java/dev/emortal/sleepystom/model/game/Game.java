@@ -1,9 +1,7 @@
 package dev.emortal.sleepystom.model.game;
 
 import com.google.common.collect.Sets;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
 import net.minestom.server.entity.Player;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;

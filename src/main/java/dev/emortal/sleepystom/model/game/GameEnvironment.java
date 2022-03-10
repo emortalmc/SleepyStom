@@ -1,6 +1,6 @@
 package dev.emortal.sleepystom.model.game;
 
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.model.game.live.LiveGenerator;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
@@ -9,10 +9,10 @@ import java.util.Set;
 
 public class GameEnvironment {
     private final @NotNull Instance instance;
-    private final @NotNull BedWarsMap map;
+    private final @NotNull ConfigMap map;
     private final @NotNull Set<LiveGenerator> generators;
 
-    public GameEnvironment(@NotNull Instance instance, @NotNull BedWarsMap map,
+    public GameEnvironment(@NotNull Instance instance, @NotNull ConfigMap map,
                            @NotNull Set<LiveGenerator> generators) {
         this.instance = instance;
         this.map = map;
@@ -23,7 +23,7 @@ public class GameEnvironment {
         return this.instance;
     }
 
-    public @NotNull BedWarsMap getMap() {
+    public @NotNull ConfigMap getMap() {
         return this.map;
     }
 

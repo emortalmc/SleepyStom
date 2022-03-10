@@ -1,7 +1,5 @@
 package dev.emortal.sleepystom.model.config.map;
 
-import com.google.gson.JsonObject;
-import dev.emortal.sleepystom.utils.JsonUtils;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -10,20 +8,20 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-public class MapGenerator {
+public class ConfigGenerator {
     private final @NotNull Pos pos;
     private @NotNull Material material;
     private transient @NotNull ItemStack itemStack;
     private @NotNull Duration delay;
 
-    public MapGenerator(@NotNull Pos pos, @NotNull Material material, @NotNull Duration delay) {
+    public ConfigGenerator(@NotNull Pos pos, @NotNull Material material, @NotNull Duration delay) {
         this.pos = pos;
         this.material = material;
         this.itemStack = ItemStack.of(this.material);
         this.delay = delay;
     }
 
-    public MapGenerator(@NotNull Pos pos, @Nullable Material material) {
+    public ConfigGenerator(@NotNull Pos pos, @Nullable Material material) {
         this(pos, material == null ? Material.AIR : material, Duration.ofMinutes(1));
     }
 

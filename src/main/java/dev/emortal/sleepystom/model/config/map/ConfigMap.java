@@ -1,7 +1,5 @@
 package dev.emortal.sleepystom.model.config.map;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.Instance;
@@ -12,18 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-public class BedWarsMap {
+public class ConfigMap {
     private final @NotNull String name;
     private final @NotNull Path instancePath;
-    private final @NotNull Set<MapTeam> teams;
-    private final @NotNull Set<MapGenerator> generators;
+    private final @NotNull Set<ConfigTeam> teams;
+    private final @NotNull Set<ConfigGenerator> generators;
     private int minTeamSize = -1;
     private int maxTeamSize = -1;
 
-    public BedWarsMap(@NotNull String name, @NotNull Set<MapTeam> teams, @NotNull Set<MapGenerator> generators, int minTeamSize, int maxTeamSize) {
+    public ConfigMap(@NotNull String name, @NotNull Set<ConfigTeam> teams, @NotNull Set<ConfigGenerator> generators, int minTeamSize, int maxTeamSize) {
         this.name = name;
         this.generators = generators;
         this.instancePath = Path.of("").resolve(this.name);
@@ -32,7 +28,7 @@ public class BedWarsMap {
         this.maxTeamSize = maxTeamSize;
     }
 
-    public BedWarsMap(@NotNull String name) {
+    public ConfigMap(@NotNull String name) {
         this.name = name;
         this.instancePath = Path.of("").resolve(this.name);
         this.generators = new HashSet<>();
@@ -47,11 +43,11 @@ public class BedWarsMap {
         return this.instancePath;
     }
 
-    public @NotNull Set<MapTeam> getTeams() {
+    public @NotNull Set<ConfigTeam> getTeams() {
         return this.teams;
     }
 
-    public @NotNull Set<MapGenerator> getGenerators() {
+    public @NotNull Set<ConfigGenerator> getGenerators() {
         return this.generators;
     }
 

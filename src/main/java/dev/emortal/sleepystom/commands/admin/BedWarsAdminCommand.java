@@ -4,7 +4,7 @@ import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.config.MapManager;
 import dev.emortal.sleepystom.game.editor.EditorManager;
 import dev.emortal.sleepystom.game.GameManager;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.CommandSender;
@@ -16,8 +16,6 @@ import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Optional;
 
 public class BedWarsAdminCommand extends Command {
@@ -50,17 +48,17 @@ public class BedWarsAdminCommand extends Command {
 
     private void executeCreateMapCommand(@NotNull CommandSender sender, @NotNull CommandContext context) {
         String mapName = context.get("mapName");
-        BedWarsMap map = this.getMap(sender, mapName);
+        ConfigMap map = this.getMap(sender, mapName);
         if (map == null)
             return;
 
-        this.mapManager.createMap(new BedWarsMap(mapName.toLowerCase()));
+        this.mapManager.createMap(new ConfigMap(mapName.toLowerCase()));
         sender.sendMessage("Map created! Use /bwa edit map " + mapName + " to edit its properties.");
     }
 
     private void executeRunGameCommand(@NotNull CommandSender sender, @NotNull CommandContext context) {
         String mapName = context.get("mapName");
-        BedWarsMap map = this.getMap(sender, mapName);
+        ConfigMap map = this.getMap(sender, mapName);
         if (map == null)
             return;
 
@@ -70,7 +68,7 @@ public class BedWarsAdminCommand extends Command {
 
     private void executeEditMapCommand(@NotNull CommandSender sender, @NotNull CommandContext context) {
         String mapName = context.get("mapName");
-        BedWarsMap map = this.getMap(sender, mapName);
+        ConfigMap map = this.getMap(sender, mapName);
         if (map == null)
             return;
 
@@ -88,8 +86,8 @@ public class BedWarsAdminCommand extends Command {
         sender.sendMessage(Component.text("Now editing " + mapName, NamedTextColor.GREEN));
     }
 
-    private BedWarsMap getMap(@NotNull CommandSender sender, @NotNull String name) {
-        Optional<BedWarsMap> optionalMap = this.mapManager.getMap(name);
+    private ConfigMap getMap(@NotNull CommandSender sender, @NotNull String name) {
+        Optional<ConfigMap> optionalMap = this.mapManager.getMap(name);
         if (optionalMap.isEmpty()) {
             sender.sendMessage("Could not find a map with the name " + name);
             return null;

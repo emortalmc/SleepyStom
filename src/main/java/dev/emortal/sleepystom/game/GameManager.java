@@ -3,8 +3,8 @@ package dev.emortal.sleepystom.game;
 import com.google.common.collect.Sets;
 import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.config.MapManager;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
-import dev.emortal.sleepystom.model.config.map.MapGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
+import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
 import dev.emortal.sleepystom.model.game.Game;
 import dev.emortal.sleepystom.model.game.GameEnvironment;
 import dev.emortal.sleepystom.model.game.live.LiveGenerator;
@@ -32,12 +32,12 @@ public class GameManager {
     }
 
     public @NotNull Game createGame() throws FileNotFoundException {
-        Collection<BedWarsMap> maps = this.mapManager.getMaps().values();
-        BedWarsMap map = maps.stream().skip(ThreadLocalRandom.current().nextInt(maps.size())).findFirst().orElseThrow(() -> new FileNotFoundException("Could not get random map"));
+        Collection<ConfigMap> maps = this.mapManager.getMaps().values();
+        ConfigMap map = maps.stream().skip(ThreadLocalRandom.current().nextInt(maps.size())).findFirst().orElseThrow(() -> new FileNotFoundException("Could not get random map"));
         return this.createGame(map);
     }
 
-    public @NotNull Game createGame(@NotNull BedWarsMap map) throws FileNotFoundException {
+    public @NotNull Game createGame(@NotNull ConfigMap map) throws FileNotFoundException {
         Game game = new Game(this.createEnvironment(map));
 
         this.games.add(game);
@@ -50,11 +50,11 @@ public class GameManager {
      * @param map A configured map to create the instance and elements from
      * @return The created instance
      */
-    public @NotNull GameEnvironment createEnvironment(@NotNull BedWarsMap map) throws FileNotFoundException {
+    public @NotNull GameEnvironment createEnvironment(@NotNull ConfigMap map) throws FileNotFoundException {
         Instance instance = map.createInstance();
 
         Set<LiveGenerator> generators = new HashSet<>();
-        for (MapGenerator generator : map.getGenerators()) {
+        for (ConfigGenerator generator : map.getGenerators()) {
             Hologram hologram = new Hologram(instance, generator.getPos(), Component.text("Temporary Text"));
             Task task = MinecraftServer.getSchedulerManager().buildTask(() -> {
                     ItemEntity drop = new ItemEntity(generator.getItemStack());

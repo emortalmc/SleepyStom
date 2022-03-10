@@ -1,20 +1,16 @@
 package dev.emortal.sleepystom.game.editor;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.config.MapManager;
 import dev.emortal.sleepystom.game.GameManager;
 import dev.emortal.sleepystom.model.EditSession;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
-import dev.emortal.sleepystom.model.config.map.MapGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
+import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
 import dev.emortal.sleepystom.model.game.GameEnvironment;
 import dev.emortal.sleepystom.utils.GeneratorUtils;
-import dev.emortal.sleepystom.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
@@ -64,7 +60,7 @@ public class EditorManager {
         this.addGlobalListeners();
     }
 
-    public void startEditing(@NotNull Player player, @NotNull BedWarsMap map) throws FileNotFoundException {
+    public void startEditing(@NotNull Player player, @NotNull ConfigMap map) throws FileNotFoundException {
         GameEnvironment environment = this.gameManager.createEnvironment(map);
 
         player.setInstance(environment.getInstance());
@@ -139,7 +135,7 @@ public class EditorManager {
         Block blockBelow = player.getInstance().getBlock(locationBelow);
 
         Material suggestedMaterial = blockBelow == Block.AIR ? Material.AIR : GeneratorUtils.suggestMaterial(Material.fromNamespaceId(blockBelow.namespace()));
-        MapGenerator generator = new MapGenerator(Pos.fromPoint(locationBelow), suggestedMaterial);
+        ConfigGenerator generator = new ConfigGenerator(Pos.fromPoint(locationBelow), suggestedMaterial);
 
         EditSession editSession = this.editUsers.get(player);
         EditGeneratorInventory editor = new EditGeneratorInventory(editSession.eventNode(), generator);
@@ -148,7 +144,7 @@ public class EditorManager {
         editSession.environment().getMap().getGenerators().add(generator);
     }
 
-    private void saveMap(@NotNull BedWarsMap map, @NotNull Player player) {
+    private void saveMap(@NotNull ConfigMap map, @NotNull Player player) {
         Instant startTime = Instant.now();
         player.sendMessage(Component.text("Saving map config to storage..."));
         this.mapManager.saveMap(map);

@@ -2,7 +2,7 @@ package dev.emortal.sleepystom.config;
 
 import com.google.gson.JsonElement;
 import dev.emortal.sleepystom.BedWarsExtension;
-import dev.emortal.sleepystom.model.config.map.BedWarsMap;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.utils.JsonUtils;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ public class MapManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(MapManager.class);
     private static final Set<String> RESERVED_NAMES = Set.of("all");
 
-    private final @NotNull Map<String, BedWarsMap> maps = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, ConfigMap> maps = new ConcurrentHashMap<>();
     private final @NotNull Path mapsPath;
 
     public MapManager(BedWarsExtension extension) {
@@ -37,7 +37,7 @@ public class MapManager {
                     continue;
                 }
                 JsonElement element = optionalElement.get();
-                BedWarsMap map = JsonUtils.GSON.fromJson(element, BedWarsMap.class);
+                ConfigMap map = JsonUtils.GSON.fromJson(element, ConfigMap.class);
 
                 this.createMap(map);
                 this.maps.put(map.getName(), map);
@@ -52,7 +52,7 @@ public class MapManager {
     }
 
     @SneakyThrows
-    public void saveMap(@NotNull BedWarsMap map) {
+    public void saveMap(@NotNull ConfigMap map) {
         Path path = this.mapsPath.resolve(map.getName() + ".json");
         if (!Files.exists(path))
             Files.createFile(path);
@@ -60,18 +60,18 @@ public class MapManager {
         JsonUtils.GSON.toJson(map, new FileWriter(path.toFile()));
     }
 
-    public void createMap(@NotNull BedWarsMap map) {
+    public void createMap(@NotNull ConfigMap map) {
         if (RESERVED_NAMES.contains(map.getName()))
             throw new IllegalArgumentException("Map name " + map.getName() + " is a reserved extension name and cannot be used");
 
         this.maps.put(map.getName(), map);
     }
 
-    public @NotNull Map<String, BedWarsMap> getMaps() {
+    public @NotNull Map<String, ConfigMap> getMaps() {
         return this.maps;
     }
 
-    public @NotNull Optional<BedWarsMap> getMap(@NotNull String name) {
+    public @NotNull Optional<ConfigMap> getMap(@NotNull String name) {
         return Optional.ofNullable(this.maps.get(name));
     }
 }
