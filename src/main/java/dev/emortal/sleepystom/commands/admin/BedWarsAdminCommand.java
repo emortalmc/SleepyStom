@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Optional;
 
 public class BedWarsAdminCommand extends Command {
@@ -53,7 +54,7 @@ public class BedWarsAdminCommand extends Command {
         if (map == null)
             return;
 
-        this.mapManager.createMap(new BedWarsMap(mapName));
+        this.mapManager.createMap(new BedWarsMap(mapName.toLowerCase()));
         sender.sendMessage("Map created! Use /bwa edit map " + mapName + " to edit its properties.");
     }
 

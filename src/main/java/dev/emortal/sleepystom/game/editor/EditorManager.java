@@ -1,17 +1,22 @@
 package dev.emortal.sleepystom.game.editor;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import dev.emortal.sleepystom.BedWarsExtension;
+import dev.emortal.sleepystom.config.MapManager;
 import dev.emortal.sleepystom.game.GameManager;
+import dev.emortal.sleepystom.model.EditSession;
 import dev.emortal.sleepystom.model.config.map.BedWarsMap;
 import dev.emortal.sleepystom.model.config.map.MapGenerator;
 import dev.emortal.sleepystom.model.game.GameEnvironment;
 import dev.emortal.sleepystom.utils.GeneratorUtils;
+import dev.emortal.sleepystom.utils.JsonUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.Event;
@@ -22,7 +27,6 @@ import net.minestom.server.event.player.PlayerBlockPlaceEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.event.trait.PlayerEvent;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -47,20 +51,21 @@ public class EditorManager {
         .displayName(Component.text("Exit Editor", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false))
         .build().withTag(EDIT_TAG, (byte) 1);
 
-    private final @NotNull Map<Player, EventNode<PlayerEvent>> editUsers = new ConcurrentHashMap<>();
+    private final @NotNull Map<Player, EditSession> editUsers = new ConcurrentHashMap<>();
     private final @NotNull GameManager gameManager;
+    private final @NotNull MapManager mapManager;
     private final @NotNull EventNode<Event> eventNode;
 
     public EditorManager(@NotNull BedWarsExtension extension) {
         this.eventNode = extension.getEventNode();
         this.gameManager = extension.getGameManager();
+        this.mapManager = extension.getMapManager();
 
         this.addGlobalListeners();
     }
 
     public void startEditing(@NotNull Player player, @NotNull BedWarsMap map) throws FileNotFoundException {
         GameEnvironment environment = this.gameManager.createEnvironment(map);
-        map.getEditingInfo().startEditing(player);
 
         player.setInstance(environment.getInstance());
         player.setGameMode(GameMode.CREATIVE);
@@ -69,7 +74,7 @@ public class EditorManager {
 
         EventNode<PlayerEvent> eventNode = EventNode.type("editor-" + player.getUsername(), EventFilter.PLAYER, (playerEvent, player1) -> player1 == player);
         this.eventNode.addChild(eventNode);
-        this.editUsers.put(player, eventNode);
+        this.editUsers.put(player, new EditSession(environment, player, eventNode));
 
         this.giveItems(player);
         this.addPlayerListeners(eventNode);
@@ -113,8 +118,12 @@ public class EditorManager {
                 event.setCancelled(true);
 
                 switch (heldSlot) {
-                    case 0 -> player.sendMessage(Component.text("You must place the generator block where you would like to create a generator."));
-                    case 7 -> this.saveInstance(player); // save item
+                    case 0 -> player.sendMessage(Component.text("You must place the generator block where you would like to create a generator.")); // generator item
+                    case 7 -> {
+                        EditSession editSession = this.editUsers.get(player);
+                        this.saveMap(editSession.environment().getMap(), player);
+                        this.saveInstance(player);
+                    } // save item
                     case 8 -> {
                         // todo exit editor
                     }
@@ -132,13 +141,23 @@ public class EditorManager {
         Material suggestedMaterial = blockBelow == Block.AIR ? Material.AIR : GeneratorUtils.suggestMaterial(Material.fromNamespaceId(blockBelow.namespace()));
         MapGenerator generator = new MapGenerator(Pos.fromPoint(locationBelow), suggestedMaterial);
 
-        EditGeneratorInventory editor = new EditGeneratorInventory(this.editUsers.get(player), generator);
+        EditSession editSession = this.editUsers.get(player);
+        EditGeneratorInventory editor = new EditGeneratorInventory(editSession.eventNode(), generator);
         player.openInventory(editor);
+
+        editSession.environment().getMap().getGenerators().add(generator);
+    }
+
+    private void saveMap(@NotNull BedWarsMap map, @NotNull Player player) {
+        Instant startTime = Instant.now();
+        player.sendMessage(Component.text("Saving map config to storage..."));
+        this.mapManager.saveMap(map);
+        player.sendMessage("Saved map config to storage in " + Instant.now().minusMillis(startTime.toEpochMilli()).toEpochMilli() + "ms");
     }
 
     private void saveInstance(@NotNull Player player) {
         Instant startTime = Instant.now();
-        player.sendMessage(Component.text("Saving world to storage..."));
+        player.sendMessage(Component.text("Saving instance to storage..."));
         player.getInstance().saveChunksToStorage().thenAccept(unused ->
             player.sendMessage("Saved instance to storage in " + Instant.now().minusMillis(startTime.toEpochMilli()).toEpochMilli() + "ms")
         );

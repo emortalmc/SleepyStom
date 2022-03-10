@@ -1,14 +1,15 @@
 package dev.emortal.sleepystom.config;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.model.config.map.BedWarsMap;
 import dev.emortal.sleepystom.utils.JsonUtils;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -24,19 +25,19 @@ public class MapManager {
     private static final Set<String> RESERVED_NAMES = Set.of("all");
 
     private final @NotNull Map<String, BedWarsMap> maps = new ConcurrentHashMap<>();
+    private final @NotNull Path mapsPath;
 
     public MapManager(BedWarsExtension extension) {
-        Path basePath = extension.getDataDirectory().resolve("maps");
+        this.mapsPath = extension.getDataDirectory().resolve("maps");
         try {
-            for (Path path : Files.list(basePath).collect(Collectors.toSet())) {
+            for (Path path : Files.list(this.mapsPath).collect(Collectors.toSet())) {
                 Optional<JsonElement> optionalElement = JsonUtils.readPath(path);
                 if (optionalElement.isEmpty()) {
                     LOGGER.warn("Failed to read map file " + path.getFileName());
                     continue;
                 }
                 JsonElement element = optionalElement.get();
-                JsonObject jsonObject = element.getAsJsonObject();
-                BedWarsMap map = BedWarsMap.fromJson(jsonObject);
+                BedWarsMap map = JsonUtils.GSON.fromJson(element, BedWarsMap.class);
 
                 this.createMap(map);
                 this.maps.put(map.getName(), map);
@@ -48,6 +49,15 @@ public class MapManager {
                 LOGGER.error("Error whilst loading maps: ", ex);
             }
         }
+    }
+
+    @SneakyThrows
+    public void saveMap(@NotNull BedWarsMap map) {
+        Path path = this.mapsPath.resolve(map.getName() + ".json");
+        if (!Files.exists(path))
+            Files.createFile(path);
+
+        JsonUtils.GSON.toJson(map, new FileWriter(path.toFile()));
     }
 
     public void createMap(@NotNull BedWarsMap map) {

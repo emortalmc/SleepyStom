@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id ("io.freefair.lombok") version "6.1.0"
 }
 
 group = "dev.emortal"
@@ -9,7 +10,6 @@ version = "1.0"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://oss.sonatype.org/content/repositories/snapshots/") // minimessage? todo plz fix
 }
 
 dependencies {

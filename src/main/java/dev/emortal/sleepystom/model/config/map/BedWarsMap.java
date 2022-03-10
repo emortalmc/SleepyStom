@@ -2,7 +2,6 @@ package dev.emortal.sleepystom.model.config.map;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import dev.emortal.sleepystom.model.EditingInfo;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.Instance;
@@ -21,7 +20,6 @@ public class BedWarsMap {
     private final @NotNull Path instancePath;
     private final @NotNull Set<MapTeam> teams;
     private final @NotNull Set<MapGenerator> generators;
-    private final @NotNull EditingInfo editingInfo = new EditingInfo();
     private int minTeamSize = -1;
     private int maxTeamSize = -1;
 
@@ -41,24 +39,12 @@ public class BedWarsMap {
         this.teams = new HashSet<>();
     }
 
-    public static @NotNull BedWarsMap fromJson(@NotNull JsonObject json) {
-        String name = json.get("name").getAsString();
-        int minTeamSize = json.get("minTeamSize").getAsInt();
-        int maxTeamSize = json.get("maxTeamSize").getAsInt();
-        Set<MapTeam> teams = StreamSupport.stream(json.get("teams").getAsJsonArray().spliterator(), false)
-            .map(JsonElement::getAsJsonObject)
-            .map(MapTeam::fromJson)
-            .collect(Collectors.toSet());
-        Set<MapGenerator> generators = StreamSupport.stream(json.get("generators").getAsJsonArray().spliterator(), false)
-            .map(JsonElement::getAsJsonObject)
-            .map(MapGenerator::fromJson)
-            .collect(Collectors.toSet());
-
-        return new BedWarsMap(name, teams, generators, minTeamSize, maxTeamSize);
-    }
-
     public @NotNull String getName() {
         return this.name;
+    }
+
+    public @NotNull Path getInstancePath() {
+        return this.instancePath;
     }
 
     public @NotNull Set<MapTeam> getTeams() {
@@ -67,10 +53,6 @@ public class BedWarsMap {
 
     public @NotNull Set<MapGenerator> getGenerators() {
         return this.generators;
-    }
-
-    public @NotNull EditingInfo getEditingInfo() {
-        return this.editingInfo;
     }
 
     public int getMinTeamSize() {
