@@ -25,8 +25,8 @@ public class BedWarsExtension extends Extension {
     public void initialize() {
         this.mapManager = new MapManager(this);
 
-        this.editorManager = new EditorManager(this);
         this.gameManager = new GameManager(this);
+        this.editorManager = new EditorManager(this);
 
         this.registerCommands(
             new BedWarsAdminCommand(this),

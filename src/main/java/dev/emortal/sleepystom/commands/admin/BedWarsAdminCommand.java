@@ -5,6 +5,8 @@ import dev.emortal.sleepystom.config.MapManager;
 import dev.emortal.sleepystom.game.editor.EditorManager;
 import dev.emortal.sleepystom.game.GameManager;
 import dev.emortal.sleepystom.model.config.map.BedWarsMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.CommandContext;
@@ -82,7 +84,7 @@ public class BedWarsAdminCommand extends Command {
         }
 
         // todo create game
-        sender.sendMessage("Edit Map: " + mapName);
+        sender.sendMessage(Component.text("Now editing " + mapName, NamedTextColor.GREEN));
     }
 
     private BedWarsMap getMap(@NotNull CommandSender sender, @NotNull String name) {

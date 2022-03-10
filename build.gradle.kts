@@ -13,12 +13,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.github.Minestom:Minestom:dab6ec6000") // Dead Code commit
+    compileOnly("com.github.Minestom:Minestom:024ba736ce") // Improve tasks performance commit
     implementation("net.kyori:adventure-text-minimessage:4.10.1")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.typesafe:config:1.4.2")
 
-    testImplementation("com.github.Minestom:Minestom:dab6ec6000")
+    testImplementation("com.github.Minestom:Minestom:024ba736ce")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }

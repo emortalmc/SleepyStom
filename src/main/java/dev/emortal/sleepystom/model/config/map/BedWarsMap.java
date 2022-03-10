@@ -65,6 +65,10 @@ public class BedWarsMap {
         return this.teams;
     }
 
+    public @NotNull Set<MapGenerator> getGenerators() {
+        return this.generators;
+    }
+
     public @NotNull EditingInfo getEditingInfo() {
         return this.editingInfo;
     }

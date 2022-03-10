@@ -1,13 +1,14 @@
 package dev.emortal.sleepystom.game.editor;
 
 import dev.emortal.sleepystom.BedWarsExtension;
+import dev.emortal.sleepystom.game.GameManager;
 import dev.emortal.sleepystom.model.config.map.BedWarsMap;
 import dev.emortal.sleepystom.model.config.map.MapGenerator;
+import dev.emortal.sleepystom.model.game.GameEnvironment;
 import dev.emortal.sleepystom.utils.GeneratorUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.minestom.server.adventure.audience.Audiences;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -46,28 +47,27 @@ public class EditorManager {
         .displayName(Component.text("Exit Editor", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false))
         .build().withTag(EDIT_TAG, (byte) 1);
 
-    private final Map<Player, EventNode<PlayerEvent>> editUsers = new ConcurrentHashMap<>();
-    private final EventNode<Event> eventNode;
+    private final @NotNull Map<Player, EventNode<PlayerEvent>> editUsers = new ConcurrentHashMap<>();
+    private final @NotNull GameManager gameManager;
+    private final @NotNull EventNode<Event> eventNode;
 
     public EditorManager(@NotNull BedWarsExtension extension) {
         this.eventNode = extension.getEventNode();
+        this.gameManager = extension.getGameManager();
 
         this.addGlobalListeners();
     }
 
-    public void startEditing(Player player, @NotNull BedWarsMap map) throws FileNotFoundException {
-        Instance instance = map.createInstance();
+    public void startEditing(@NotNull Player player, @NotNull BedWarsMap map) throws FileNotFoundException {
+        GameEnvironment environment = this.gameManager.createEnvironment(map);
         map.getEditingInfo().startEditing(player);
 
-        player.setInstance(instance);
+        player.setInstance(environment.getInstance());
         player.setGameMode(GameMode.CREATIVE);
         player.setAllowFlying(true);
         player.setFlying(true);
 
-        EventNode<PlayerEvent> eventNode = EventNode.type("editor-" + player.getUsername(), EventFilter.PLAYER, (playerEvent, player1) -> {
-            Audiences.all().sendMessage(Component.text("Comparing " + player.hashCode() + " and " + player1.hashCode()));
-            return player1 == player;
-        });
+        EventNode<PlayerEvent> eventNode = EventNode.type("editor-" + player.getUsername(), EventFilter.PLAYER, (playerEvent, player1) -> player1 == player);
         this.eventNode.addChild(eventNode);
         this.editUsers.put(player, eventNode);
 
@@ -94,7 +94,6 @@ public class EditorManager {
     private void addPlayerListeners(EventNode<PlayerEvent> eventNode) {
         eventNode
             .addListener(PlayerBlockPlaceEvent.class, event -> {
-                Audiences.all().sendMessage(Component.text("PlayerBlockPlaceEvent " + event.getPlayer().getItemInMainHand().hasTag(EDIT_TAG)));
                 Player player = event.getPlayer();
                 event.setCancelled(player.getItemInMainHand().hasTag(EDIT_TAG));
 
@@ -106,11 +105,9 @@ public class EditorManager {
                 }
             })
             .addListener(ItemDropEvent.class, event -> {
-                Audiences.all().sendMessage(Component.text("ItemDropEvent " + event.getItemStack().hasTag(EDIT_TAG)));
                 event.setCancelled(event.getItemStack().hasTag(EDIT_TAG));
             })
             .addListener(PlayerUseItemEvent.class, event -> {
-                Audiences.all().sendMessage(Component.text("PlayerUseItemEvent "));
                 Player player = event.getPlayer();
                 byte heldSlot = player.getHeldSlot();
                 event.setCancelled(true);
@@ -133,7 +130,7 @@ public class EditorManager {
         Block blockBelow = player.getInstance().getBlock(locationBelow);
 
         Material suggestedMaterial = blockBelow == Block.AIR ? Material.AIR : GeneratorUtils.suggestMaterial(Material.fromNamespaceId(blockBelow.namespace()));
-        MapGenerator generator = new MapGenerator(Vec.fromPoint(locationBelow), suggestedMaterial);
+        MapGenerator generator = new MapGenerator(Pos.fromPoint(locationBelow), suggestedMaterial);
 
         EditGeneratorInventory editor = new EditGeneratorInventory(this.editUsers.get(player), generator);
         player.openInventory(editor);
