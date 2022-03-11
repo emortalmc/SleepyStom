@@ -5,18 +5,17 @@ import dev.emortal.sleepystom.model.game.live.LiveGenerator;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class GameEnvironment {
     private final @NotNull Instance instance;
     private final @NotNull ConfigMap map;
-    private final @NotNull Set<LiveGenerator> generators;
+    private final @NotNull Set<LiveGenerator> generators = new HashSet<>();
 
-    public GameEnvironment(@NotNull Instance instance, @NotNull ConfigMap map,
-                           @NotNull Set<LiveGenerator> generators) {
+    public GameEnvironment(@NotNull Instance instance, @NotNull ConfigMap map) {
         this.instance = instance;
         this.map = map;
-        this.generators = generators;
     }
 
     public @NotNull Instance getInstance() {

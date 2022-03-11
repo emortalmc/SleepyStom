@@ -10,12 +10,14 @@ import java.time.Duration;
 
 public class ConfigGenerator {
     private final @NotNull Pos pos;
+    private final @NotNull Pos itemSpawnPos;
     private @NotNull Material material;
     private transient @NotNull ItemStack itemStack;
     private @NotNull Duration delay;
 
     public ConfigGenerator(@NotNull Pos pos, @NotNull Material material, @NotNull Duration delay) {
         this.pos = pos;
+        this.itemSpawnPos = pos.sub(0, 1, 0);
         this.material = material;
         this.itemStack = ItemStack.of(this.material);
         this.delay = delay;
@@ -27,6 +29,10 @@ public class ConfigGenerator {
 
     public @NotNull Pos getPos() {
         return this.pos;
+    }
+
+    public @NotNull Pos getItemSpawnPos() {
+        return this.itemSpawnPos;
     }
 
     public @NotNull Material getMaterial() {

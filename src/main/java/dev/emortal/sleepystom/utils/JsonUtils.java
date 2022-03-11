@@ -6,10 +6,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSerializer;
-import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.model.config.map.ConfigTeam;
 import net.minestom.server.color.Color;
 import net.minestom.server.coordinate.Pos;
@@ -131,7 +132,28 @@ public class JsonUtils {
         return new ConfigTeam(name, color, spawn);
     };
 
+    private static final JsonSerializer<ConfigGenerator> GENERATOR_SERIALIZER = (generator, type, context) -> {
+        JsonObject json = new JsonObject();
+        json.add("pos", context.serialize(generator.getPos()));
+        json.addProperty("material", generator.getMaterial().name());
+        json.add("delay", context.serialize(generator.getDelay()));
+
+        return json;
+    };
+
+    private static final JsonDeserializer<ConfigGenerator> GENERATOR_DESERIALIZER = (element, type, context) -> {
+        JsonObject json = element.getAsJsonObject();
+        Pos pos = context.deserialize(json.get("pos"), Pos.class);
+        Material material = Material.fromNamespaceId(json.get("material").getAsString());
+        Duration delay = context.deserialize(json.get("delay"), Duration.class);
+        if (material == null)
+            throw new JsonParseException("Could not find material with namespace id " + json.get("material").getAsString());
+
+        return new ConfigGenerator(pos, material, delay);
+    };
+
     public static Gson GSON = new GsonBuilder()
+        .setPrettyPrinting()
         // java classes
         .registerTypeAdapter(Duration.class, DURATION_DESERIALIZER)
         .registerTypeAdapter(Duration.class, DURATION_SERIALIZER)
@@ -150,6 +172,9 @@ public class JsonUtils {
 
         .registerTypeAdapter(ConfigTeam.class, MAP_TEAM_DESERIALIZER)
         .registerTypeAdapter(ConfigTeam.class, MAP_TEAM_SERIALIZER)
+
+        .registerTypeAdapter(ConfigGenerator.class, GENERATOR_DESERIALIZER)
+        .registerTypeAdapter(ConfigGenerator.class, GENERATOR_SERIALIZER)
         .create();
 
     public static @NotNull Optional<JsonElement> readPath(Path path) {

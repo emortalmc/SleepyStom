@@ -132,16 +132,18 @@ public class EditorManager {
 
         Point location = event.getBlockPosition();
         Point locationBelow = location.sub(0, 1, 0);
+        Point locationAbove = location.add(0.5, 4, 0.5);
         Block blockBelow = player.getInstance().getBlock(locationBelow);
 
         Material suggestedMaterial = blockBelow == Block.AIR ? Material.AIR : GeneratorUtils.suggestMaterial(Material.fromNamespaceId(blockBelow.namespace()));
-        ConfigGenerator generator = new ConfigGenerator(Pos.fromPoint(locationBelow), suggestedMaterial);
+        ConfigGenerator generator = new ConfigGenerator(Pos.fromPoint(locationAbove), suggestedMaterial);
 
         EditSession editSession = this.editUsers.get(player);
         EditGeneratorInventory editor = new EditGeneratorInventory(editSession.eventNode(), generator);
         player.openInventory(editor);
 
-        editSession.environment().getMap().getGenerators().add(generator);
+        this.gameManager.drawGenerator(editSession.environment(), generator); // register in game
+        editSession.environment().getMap().getGenerators().add(generator); // register in config
     }
 
     private void saveMap(@NotNull ConfigMap map, @NotNull Player player) {

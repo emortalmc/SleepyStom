@@ -5,6 +5,8 @@ import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.utils.JsonUtils;
 import lombok.SneakyThrows;
+import net.kyori.adventure.text.Component;
+import net.minestom.server.adventure.audience.Audiences;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,11 @@ public class MapManager {
         if (!Files.exists(path))
             Files.createFile(path);
 
-        JsonUtils.GSON.toJson(map, new FileWriter(path.toFile()));
+        Audiences.all().sendMessage(Component.text("Writing map to file " + path));
+        try (FileWriter writer = new FileWriter(path.toFile())) {
+            JsonUtils.GSON.toJson(map, writer);
+        }
+        Audiences.all().sendMessage(Component.text("wrote map to file " + path));
     }
 
     public void createMap(@NotNull ConfigMap map) {

@@ -3,8 +3,8 @@ package dev.emortal.sleepystom.game;
 import com.google.common.collect.Sets;
 import dev.emortal.sleepystom.BedWarsExtension;
 import dev.emortal.sleepystom.config.MapManager;
-import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.model.config.map.ConfigGenerator;
+import dev.emortal.sleepystom.model.config.map.ConfigMap;
 import dev.emortal.sleepystom.model.game.Game;
 import dev.emortal.sleepystom.model.game.GameEnvironment;
 import dev.emortal.sleepystom.model.game.live.LiveGenerator;
@@ -18,8 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -53,20 +51,26 @@ public class GameManager {
     public @NotNull GameEnvironment createEnvironment(@NotNull ConfigMap map) throws FileNotFoundException {
         Instance instance = map.createInstance();
 
-        Set<LiveGenerator> generators = new HashSet<>();
-        for (ConfigGenerator generator : map.getGenerators()) {
-            Hologram hologram = new Hologram(instance, generator.getPos(), Component.text("Temporary Text"));
-            Task task = MinecraftServer.getSchedulerManager().buildTask(() -> {
-                    ItemEntity drop = new ItemEntity(generator.getItemStack());
-                    drop.setMergeable(false);
-                    drop.setInstance(instance, generator.getPos());
-                    drop.spawn();
-                }).repeat(generator.getDelay())
-                .schedule();
-            generators.add(new LiveGenerator(generator, hologram, task));
-        }
+        GameEnvironment environment = new GameEnvironment(instance, map);
+        Set<LiveGenerator> generators = environment.getGenerators();
 
-        return new GameEnvironment(instance, map, Collections.unmodifiableSet(generators));
+        for (ConfigGenerator generator : map.getGenerators())
+            generators.add(this.drawGenerator(environment, generator));
+
+        return environment;
+    }
+
+    public LiveGenerator drawGenerator(@NotNull GameEnvironment environment, @NotNull ConfigGenerator generator) {
+        Instance instance = environment.getInstance();
+        Hologram hologram = new Hologram(instance, generator.getPos(), Component.text("Temporary Text"));
+        Task task = MinecraftServer.getSchedulerManager().buildTask(() -> {
+                ItemEntity drop = new ItemEntity(generator.getItemStack());
+                drop.setMergeable(false);
+                drop.setInstance(instance, generator.getItemSpawnPos());
+                drop.spawn();
+            }).repeat(generator.getDelay())
+            .schedule();
+        return new LiveGenerator(generator, hologram, task);
     }
 
     public @NotNull Set<Game> getGames() {
