@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    id ("io.freefair.lombok") version "6.4.1"
+    id ("io.freefair.lombok") version "6.4.2"
 }
 
 group = "dev.emortal"
