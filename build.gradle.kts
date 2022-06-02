@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     compileOnly("com.github.Minestom:Minestom:024ba736ce") // Improve tasks performance commit
-    implementation("net.kyori:adventure-text-minimessage:4.10.1")
+    implementation("net.kyori:adventure-text-minimessage:4.11.0")
     implementation("com.google.guava:guava:31.1-jre")
     implementation("com.typesafe:config:1.4.2")
 
